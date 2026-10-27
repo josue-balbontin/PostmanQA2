@@ -1,80 +1,52 @@
 pipeline {
     agent any
-    options {
-        disableConcurrentBuilds()
-        timeout(time: 20, unit: 'MINUTES')
+
+    tools {
+        maven 'Maven' // Nombre del Maven configurado en Jenkins
+        jdk 'Java17'   // Nombre del JDK configurado en Jenkins
     }
-    environment {
-        // Soporte tanto para Windows (rutas npm locales y de usuario) como para macOS/Linux
-        PATH = "C:\\Users\\Jogab\\AppData\\Roaming\\npm;C:\\Users\\rsalazarh\\AppData\\Roaming\\npm;C:\\nvm4w\\nodejs;/opt/homebrew/bin:/usr/local/bin:${env.PATH}"
-    }
+
     stages {
-        stage('Preparación') {
+
+        stage('Checkout') {
             steps {
-                script {
-                    if (isUnix()) {
-                        sh 'node --version && npm --version && newman --version'
-                        dir('webdriverio') {
-                            sh 'npm ci --no-audit --no-fund'
-                        }
-                    } else {
-                        bat 'node --version && npm --version && newman --version'
-                        dir('webdriverio') {
-                            bat 'npm ci --no-audit --no-fund'
-                        }
-                    }
-                }
+                echo 'Clonando el repositorio...'
+                git branch: 'main', url: 'https://github.com/josue-balbontin/PostmanQA2.git'
             }
         }
-        stage('Newman') {
+
+        stage('Build & Test') {
             steps {
-                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                    script {
-                        if (isUnix()) {
-                            sh '''
-                                mkdir -p reports
-                                newman run GoRest.postman_collection.json -e GoRest.postman_environment.json -r cli,html --reporter-html-export "reports/Newman_Report.html" -x
-                            '''
-                        } else {
-                            bat '''
-                                if not exist reports mkdir reports
-                                newman run GoRest.postman_collection.json -e GoRest.postman_environment.json -r cli,html --reporter-html-export "reports\\Newman_Report.html" -x
-                            '''
-                        }
-                    }
-                }
-            }
-            post {
-                always {
-                    publishHTML(target: [
-                        reportName: 'Newman HTML Report',
-                        reportDir: 'reports',
-                        reportFiles: 'Newman_Report.html',
-                        keepAll: true,
-                        alwaysLinkToLastBuild: true,
-                        allowMissing: true
-                    ])
-                }
+                echo 'Ejecutando pruebas Karate...'
+                bat 'mvn test -Dkarate.options="--tags @Smock"'
             }
         }
-        stage('WebdriverIO') {
+
+        stage('Publicar Reporte') {
             steps {
-                dir('webdriverio') {
-                    script {
-                        if (isUnix()) {
-                            sh 'npm test'
-                        } else {
-                            bat 'npm test'
-                        }
-                    }
-                }
+                echo 'Publicando reporte HTML de Karate...'
+                publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target/karate-reports',
+                    reportFiles: 'karate-summary.html',
+                    reportName: 'Reporte de Pruebas Karate'
+                ])
             }
-            post {
-                always {
-                    junit testResults: 'webdriverio/reports/junit/*.xml', allowEmptyResults: false
-                    archiveArtifacts artifacts: 'webdriverio/reports/**/*', allowEmptyArchive: true
-                }
-            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finalizado — limpiando workspace.'
+            cleanWs()
+        }
+        success {
+            echo 'Pruebas Karate ejecutadas con éxito.'
+        }
+        failure {
+            echo 'Falló alguna etapa del pipeline.'
         }
     }
 }

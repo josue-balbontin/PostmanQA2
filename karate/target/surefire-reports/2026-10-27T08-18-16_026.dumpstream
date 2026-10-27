@@ -1,0 +1,5 @@
+# Created at 2026-10-27T08:18:16.703
+Boot Manifest-JAR contains absolute paths in classpath 'D:\josue\AAuniversidad\QA2\JHENKINS\PostmanQA2\karate\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

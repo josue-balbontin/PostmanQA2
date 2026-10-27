@@ -1,0 +1,3 @@
+08:18:19.497 [main] INFO  com.intuit.karate.Runner - using system property 'karate.options': --tags @Smock
+08:18:21.942 [main] DEBUG com.intuit.karate.Suite - [config] classpath:karate-config.js
+08:18:21.958 [main] DEBUG com.intuit.karate.Suite - waiting for 3 features to complete

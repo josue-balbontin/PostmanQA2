@@ -1,3 +1,9 @@
 .DS_Store
 node_modules/
 webdriverio/reports/
+allure-results/
+allure-report/
+**/allure-results/
+**/allure-report/
+**/node_modules/
+target/

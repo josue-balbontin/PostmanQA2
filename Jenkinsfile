@@ -23,7 +23,7 @@ pipeline {
         stage('Instalar dependencias') {
             steps {
                 echo 'Instalando dependencias de Newman...'
-                bat 'npm install'
+                bat 'npm install --legacy-peer-deps'
             }
         }
 

@@ -16,7 +16,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Clonando rama postman...'
-                git branch: 'postman', url: 'https://github.com/josue-balbontin/PostmanQA2.git'
+                git branch: 'postman', url: 'https://github.com/josue-balbontin/jhenkins.git'
             }
         }
 

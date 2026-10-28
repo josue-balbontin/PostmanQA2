@@ -20,7 +20,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Clonando rama wdio-movil...'
-                git branch: 'wdio-movil', url: 'https://github.com/josue-balbontin/PostmanQA2.git'
+                git branch: 'wdio-movil', url: 'https://github.com/josue-balbontin/jhenkins.git'
             }
         }
 

@@ -66,7 +66,7 @@ exports.config = {
       'browserstack',
       {
         buildIdentifier: "${BUILD_NUMBER}",
-        browserstackLocal: true
+        browserstackLocal: false
       },
     ]],
 

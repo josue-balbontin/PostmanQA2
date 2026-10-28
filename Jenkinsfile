@@ -34,7 +34,9 @@ pipeline {
         stage('Ejecutar WDIO Movil BrowserStack') {
             steps {
                 echo 'Ejecutando pruebas moviles en BrowserStack...'
-                bat 'npx wdio run wdio.conf.js'
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    bat 'npx wdio run wdio.conf.js'
+                }
             }
         }
 

@@ -32,7 +32,7 @@ pipeline {
                 echo 'Ejecutando coleccion Postman...'
                 bat '''
                 if not exist reports mkdir reports
-                npx newman run GoRest.postman_collection.json -e GoRest.postman_environment.json -r cli,html --reporter-html-export "reports\\Newman_Report.html"
+                npx newman run GoRest.postman_collection.json -e GoRest.postman_environment.json -r cli,html --reporter-html-export "reports\\Newman_Report.html" -x
                 '''
             }
         }

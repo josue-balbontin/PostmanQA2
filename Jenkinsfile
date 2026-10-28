@@ -18,7 +18,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'wdio-web', url: 'https://github.com/josue-balbontin/PostmanQA2.git'
+                git branch: 'wdio-web', url: 'https://github.com/josue-balbontin/jhenkins.git'
             }
         }
 

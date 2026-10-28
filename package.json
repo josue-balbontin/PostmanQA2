@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "Pruebas de API con Postman y Newman para Jenkins",
   "scripts": {
-    "test": "newman run \"GoRest.postman_collection.json\" -e \"GoRest.postman_environment.json\" -r cli,html --reporter-html-export reports/Newman_Report.html",
-    "test:practico1": "newman run \"practico 1 QA2.postman_collection.json\" -e \"practico 1 QA2.postman_environment.json\" -r cli,html --reporter-html-export reports/Newman_Report.html -x"
+    "test": "newman run \"GoRest.postman_collection.json\" -e \"GoRest.postman_environment.json\" -r cli,htmlextra --reporter-htmlextra-export reports/Newman_Report.html",
+    "test:practico1": "newman run \"practico 1 QA2.postman_collection.json\" -e \"practico 1 QA2.postman_environment.json\" -r cli,htmlextra --reporter-htmlextra-export reports/Newman_Report.html -x"
   },
   "devDependencies": {
     "newman": "^6.2.3",
-    "newman-reporter-html": "^1.0.5"
+    "newman-reporter-htmlextra": "^1.23.1"
   }
 }

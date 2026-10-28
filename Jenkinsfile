@@ -17,7 +17,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Clonando el repositorio...'
-                git branch: 'karate', url: 'https://github.com/josue-balbontin/PostmanQA2.git'
+                git branch: 'karate', url: 'https://github.com/josue-balbontin/jhenkins.git'
             }
         }
 

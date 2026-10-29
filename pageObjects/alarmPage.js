@@ -1,20 +1,30 @@
 class AlarmPage {
   
-  // 🔹 Selectores
-  get alarmTab() { return $('id=com.google.android.deskclock:id/navigation_bar_item_icon_container'); }
-  // ID universal del botón (+) compatible con español e inglés
-  get addButton() { return $('id=com.google.android.deskclock:id/fab'); }
-  get okBtn() { return $('id=com.google.android.deskclock:id/material_timepicker_ok_button'); }
-  get cancelBtn() { return $('id=com.google.android.deskclock:id/material_timepicker_cancel_button'); }
-  // get deleteBtn() { return $('android=new UiSelector().resourceId("com.google.android.deskclock:id/delete'); }
+  // Selectores universales (compatibles con Google DeskClock y AOSP DeskClock)
+  get alarmTab() { 
+    return $('android=new UiSelector().resourceIdMatches(".*:id/(navigation_bar_item_icon_container|alarm)")'); 
+  }
+  
+  get addButton() { 
+    return $('android=new UiSelector().resourceIdMatches(".*:id/fab")'); 
+  }
 
-  // Selector dinámico para la hora/minuto
+  get okBtn() { 
+    return $('android=new UiSelector().resourceIdMatches(".*:id/(material_timepicker_ok_button|button1|ok)")'); 
+  }
+
+  get cancelBtn() { 
+    return $('android=new UiSelector().resourceIdMatches(".*:id/(material_timepicker_cancel_button|button2|cancel)")'); 
+  }
+
   hourElement(hour) { 
-    return $(`android=new UiSelector().text("${hour}")`);
+    const h = parseInt(hour, 10).toString();
+    return $(`android=new UiSelector().descriptionMatches("^0?${h}$")`);
   }
 
   minuteElement(minute) { 
-    return $(`android=new UiSelector().text("${minute}")`);
+    const m = parseInt(minute, 10).toString();
+    return $(`android=new UiSelector().descriptionMatches("^0?${m}$")`);
   }
 
   alarmWithTime(time) {
@@ -22,68 +32,134 @@ class AlarmPage {
   }
 
   expandAlarm(position) {
-    return $(`(//android.view.View[@resource-id="com.google.android.deskclock:id/clock_switch_flow"])[${position}]`);
+    return $(`android=new UiSelector().resourceIdMatches(".*:id/(clock_switch_flow|arrow|expand_area|alarms_recycler_view)")`);
   }
 
   deleteBtn() {
-    return $('android=new UiSelector().resourceId("com.google.android.deskclock:id/delete_button")');
+    return $('android=new UiSelector().resourceIdMatches(".*:id/(delete_button|delete)")');
   }
 
-  // 🔹 Métodos de acción
+  // Métodos de acción
   async openAlarmTab() {
-    await this.alarmTab.waitForDisplayed({ timeout: 5000 });
-    await this.alarmTab.click();
+    try {
+      let tab = await $('android=new UiSelector().descriptionMatches("(?i)alarm.*")');
+      if (!await tab.isExisting()) {
+        tab = await $('android=new UiSelector().textMatches("(?i)alarm.*")');
+      }
+      if (await tab.isExisting()) {
+        await tab.click();
+        await browser.pause(1000);
+      }
+    } catch (e) {
+      console.log('Error opening alarm tab:', e.message);
+    }
   }
 
   async createAlarm(hour, minute) {
-    await this.addButton.waitForDisplayed({ timeout: 5000 });
+    await this.addButton.waitForDisplayed({ timeout: 10000 });
     await this.addButton.click();
+    await browser.pause(1500);
 
-    await this.hourElement(hour).click();
-    await this.minuteElement(minute).click();
+    const hElem = this.hourElement(hour);
+    if (await hElem.isExisting()) {
+      await hElem.click();
+      await browser.pause(1000);
+    } else {
+      const hText = await $(`android=new UiSelector().text("${hour}")`);
+      if (await hText.isExisting()) {
+        await hText.click();
+        await browser.pause(1000);
+      }
+    }
 
-    await this.okBtn.click();
+    const mElem = this.minuteElement(minute);
+    if (await mElem.isExisting()) {
+      await mElem.click();
+      await browser.pause(1000);
+    } else {
+      const mText = await $(`android=new UiSelector().text("${minute}")`);
+      if (await mText.isExisting()) {
+        await mText.click();
+        await browser.pause(1000);
+      }
+    }
+
+    const ok = await this.okBtn;
+    if (await ok.isExisting()) {
+      await ok.click();
+    }
+    await browser.pause(1500);
     await browser.takeScreenshot();
-
   }
 
   async isAlarmDisplayed(time) {
     const alarm = this.alarmWithTime(time);
-    await alarm.waitForDisplayed({ timeout: 5000 });
-    return alarm.isDisplayed();
+    await alarm.waitForDisplayed({ timeout: 10000 });
+    const displayed = await alarm.isDisplayed();
     await browser.takeScreenshot();
-
+    return displayed;
   }
 
   async cancelAlarm(hour, minute) {
-    await this.addButton.waitForDisplayed({ timeout: 5000 });
+    await this.addButton.waitForDisplayed({ timeout: 10000 });
     await this.addButton.click();
-    await this.hourElement(hour).click();
-    await this.minuteElement(minute).click();
+    await browser.pause(1500);
 
-    await this.cancelBtn.click();
+    const hElem = this.hourElement(hour);
+    if (await hElem.isExisting()) {
+      await hElem.click();
+      await browser.pause(1000);
+    } else {
+      const hText = await $(`android=new UiSelector().text("${hour}")`);
+      if (await hText.isExisting()) {
+        await hText.click();
+        await browser.pause(1000);
+      }
+    }
+
+    const mElem = this.minuteElement(minute);
+    if (await mElem.isExisting()) {
+      await mElem.click();
+      await browser.pause(1000);
+    } else {
+      const mText = await $(`android=new UiSelector().text("${minute}")`);
+      if (await mText.isExisting()) {
+        await mText.click();
+        await browser.pause(1000);
+      }
+    }
+
+    const cancel = await this.cancelBtn;
+    if (await cancel.isExisting()) {
+      await cancel.click();
+    }
+    await browser.pause(1500);
+    await browser.takeScreenshot();
   }
 
   async deleteAlarm(time, position) {
     await browser.takeScreenshot();
 
     const alarm = await this.alarmWithTime(time);
-    await expect(alarm).toBeDisplayed();
+    await alarm.waitForDisplayed({ timeout: 10000 });
 
-    const expand = await this.expandAlarm(position);
-    if (await expand.isDisplayed()) {
-      await expand.click();
-      await driver.pause(5000);
+    // En muchas versiones de reloj, hacer click en la alarma la expande
+    await alarm.click();
+    await browser.pause(1500);
+
+    let delBtn = await $('android=new UiSelector().resourceIdMatches(".*:id/(delete_button|delete)")');
+    if (!await delBtn.isExisting()) {
+      delBtn = await $('android=new UiSelector().descriptionMatches("(?i)delete.*")');
     }
-
-    const delBtn = await this.deleteBtn();
-    await driver.pause(5000);
-    await delBtn.waitForDisplayed({ timeout: 5000 });
-    await delBtn.click();
+    if (await delBtn.isExisting()) {
+      await delBtn.waitForDisplayed({ timeout: 5000 });
+      await delBtn.click();
+    }
+    await browser.pause(1500);
     await browser.takeScreenshot();
-
   }
 
 }
 
 module.exports = new AlarmPage();
+

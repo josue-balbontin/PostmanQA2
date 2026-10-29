@@ -31,23 +31,24 @@ exports.config = {
         platformName: 'android',
         'appium:automationName': 'UiAutomator2',
 
-        // 🔹 APK subida a BrowserStack (Práctico 4 Bloque 2)
-        // 🔹 En BrowserStack con Google Pixel se usa la app de reloj preinstalada
-        ...(process.env.BROWSERSTACK_APP_ID ? { 'appium:app': process.env.BROWSERSTACK_APP_ID } : {
-            'appium:appPackage': 'com.google.android.deskclock',
-            'appium:appActivity': 'com.android.deskclock.DeskClock'
-        }),
+        // 🔹 APK subida a BrowserStack
+        'appium:app': 'bs://2985b850d31547462c251bfa65b1b07fd1892b1b',
+        'appium:appPackage': 'com.chen.deskclock',
+        'appium:appActivity': 'com.chen.deskclock.DeskClock',
 
         // 🔹 Opciones de BrowserStack
         'bstack:options': {
-            deviceName: 'Google Pixel 7',
+            deviceName: 'Google Pixel 7',  // dispositivo real en la nube
             osVersion: '13.0',
             projectName: 'Proyecto QA',
             buildName: 'Build Alarmas',
             sessionName: 'Prueba APK Alarmas',
             local: false  // si no necesitas BrowserStack Local
         }
-    }],
+    }
+
+
+],
 
     //
     // ===================
@@ -59,26 +60,34 @@ exports.config = {
     connectionRetryTimeout: 120000,
     connectionRetryCount: 3,
 
-    // Servicio Appium y BrowserStack administrado por WebdriverIO
-    services: [
-        'appium',
-        [
-            'browserstack',
-            {
-                buildIdentifier: "${BUILD_NUMBER}",
-                browserstackLocal: false
-            }
-        ]
-    ],
+    // Servicio Appium administrado por WebdriverIO
+    services: ['appium',
+    [
+      'browserstack',
+      {
+        buildIdentifier: "${BUILD_NUMBER}",
+        browserstackLocal: true
+      },
+    ]],
+
 
     // Framework Cucumber BDD
     framework: 'cucumber',
 
-    // Reportes (Spec para salida directa en consola de Jenkins)
-    reporters: ['spec'],
+    // Reportes
+    reporters: [
+        'spec',
+        ['allure', {
+            outputDir: 'allure-results',
+            disableWebdriverStepsReporting: true,
+            disableWebdriverScreenshotsReporting: false,
+            useCucumberStepReporter: true
+        }]
+    ],
 
     // Configuración específica de Cucumber
     cucumberOpts: {
+        // Rutas requeridas para step definitions
         require: ['./features/step_definitions/alarmStep.js'],
         backtrace: false,
         requireModule: [],
@@ -92,3 +101,5 @@ exports.config = {
         ignoreUndefinedDefinitions: false
     }
 };
+
+

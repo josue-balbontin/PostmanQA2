@@ -32,7 +32,11 @@ exports.config = {
         'appium:automationName': 'UiAutomator2',
 
         // 🔹 APK subida a BrowserStack (Práctico 4 Bloque 2)
-        'appium:app': process.env.BROWSERSTACK_APP_ID || 'bs://0e9254bae676a1f6d5a904732c5f0b1eda2c75d0',
+        // 🔹 En BrowserStack con Google Pixel se usa la app de reloj preinstalada
+        ...(process.env.BROWSERSTACK_APP_ID ? { 'appium:app': process.env.BROWSERSTACK_APP_ID } : {
+            'appium:appPackage': 'com.google.android.deskclock',
+            'appium:appActivity': 'com.android.deskclock.DeskClock'
+        }),
 
         // 🔹 Opciones de BrowserStack
         'bstack:options': {
